@@ -1,0 +1,21 @@
+{
+  "name": "gen-music",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "concurrently": "^9.2.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "tone": "^15.0.4"
+  },
+  "scripts": {
+    "dev:ts": "bun build src/index.ts --outdir=public --watch",
+    "watch:scss": "sass --watch src/styles/main.scss public/styles.css",
+    "dev": "concurrently \"bun run dev:ts\" \"bun run watch:scss\""
+  }
+
+}

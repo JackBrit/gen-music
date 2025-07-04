@@ -1,0 +1,3 @@
+[build]
+outdir = "public"
+watch = true
