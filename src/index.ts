@@ -1,5 +1,5 @@
 import { playEnoPiece } from './tracks/eno';
-import * as Tone from 'tone';
+import {Analyser} from 'tone';
 
 document.getElementById('piano-piece')?.addEventListener('click', async () => {
    drawFeedbackCircle();
@@ -44,7 +44,7 @@ function drawCircle(
 
 
 
-export function startVisualizer(analyser: Tone.Analyser) {
+export function startVisualizer(analyser: Analyser) {
   const context = getCanvasContext();
   if (!context) return;
 
