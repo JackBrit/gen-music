@@ -9059,6 +9059,9 @@ function setContext(context2, disposeOld = false) {
     globalContext = context2;
   }
 }
+function start() {
+  return globalContext.resume();
+}
 if (theWindow && !theWindow.TONE_SILENCE_LOGGING) {
   let prefix = "v";
   if (version === "dev") {
@@ -13427,9 +13430,9 @@ class FatOscillator extends Source {
   set spread(spread) {
     this._spread = spread;
     if (this._oscillators.length > 1) {
-      const start = -spread / 2;
+      const start2 = -spread / 2;
       const step = spread / (this._oscillators.length - 1);
-      this._forEach((osc, i) => osc.detune.value = start + step * i);
+      this._forEach((osc, i) => osc.detune.value = start2 + step * i);
     }
   }
   get count() {
@@ -15992,8 +15995,14 @@ class Channel extends ToneAudioNode {
 Channel.buses = new Map;
 // node_modules/tone/build/esm/index.js
 var Transport = getContext().transport;
+function getTransport() {
+  return getContext().transport;
+}
 var Destination = getContext().destination;
 var Master = getContext().destination;
+function getDestination() {
+  return getContext().destination;
+}
 var Listener = getContext().listener;
 var Draw = getContext().draw;
 var context2 = getContext();
@@ -16021,28 +16030,28 @@ async function playEnoPiece() {
     const sampler = new Sampler({
       baseUrl: "/samples/upright-piano/",
       urls: {
-        A0: "a0.wav",
-        "C#1": "csharp1.wav",
-        F1: "f1.wav",
-        "C#2": "csharp2.wav",
-        F2: "f2.wav",
-        A2: "a2.wav",
-        "C#3": "csharp3.wav",
-        F3: "f3.wav",
-        A3: "a3.wav",
-        "C#4": "csharp4.wav",
-        F4: "f4.wav",
-        A4: "a4.wav",
-        "C#5": "csharp5.wav",
-        F5: "f5.wav",
-        A5: "a5.wav",
-        "C#6": "csharp6.wav",
-        F6: "f6.wav",
-        A6: "a6.wav",
-        "C#7": "csharp7.wav",
-        F7: "f7.wav",
-        A7: "a7.wav",
-        C8: "c8.wav"
+        A0: "a0.mp3",
+        "C#1": "csharp1.mp3",
+        F1: "f1.mp3",
+        "C#2": "csharp2.mp3",
+        F2: "f2.mp3",
+        A2: "a2.mp3",
+        "C#3": "csharp3.mp3",
+        F3: "f3.mp3",
+        A3: "a3.mp3",
+        "C#4": "csharp4.mp3",
+        F4: "f4.mp3",
+        A4: "a4.mp3",
+        "C#5": "csharp5.mp3",
+        F5: "f5.mp3",
+        A5: "a5.mp3",
+        "C#6": "csharp6.mp3",
+        F6: "f6.mp3",
+        A6: "a6.mp3",
+        "C#7": "csharp7.mp3",
+        F7: "f7.mp3",
+        A7: "a7.mp3",
+        C8: "c8.mp3"
       },
       volume: -6,
       onload: () => {
@@ -16067,7 +16076,7 @@ async function playEnoPiece() {
     }, 30, 35, getRandomBetween(2, 15));
     scheduleRandomRepeat(function(time) {
       sampler.triggerAttack("Eb5", time);
-    }, 17, 25);
+    }, 1, 5);
     scheduleRandomRepeat(function(time) {
       sampler.triggerAttack("F5", time);
     }, 12, 43);
@@ -16078,11 +16087,44 @@ async function playEnoPiece() {
 }
 
 // src/index.ts
-document.getElementById("piano-piece")?.addEventListener("click", async () => {
-  drawFeedbackCircle();
-  const analyser = await playEnoPiece();
-  startVisualizer(analyser);
+var hasStarted = false;
+var analyser;
+var handleDOMContentLoaded = () => {
+  attachControlHandlers();
+};
+document.getElementById("play")?.addEventListener("click", async () => {
+  const audio = document.getElementById("controls");
+  if (audio) {
+    audio.play().catch((err) => {
+      console.error("Playback failed:", err);
+    });
+  }
 });
+document.addEventListener("DOMContentLoaded", handleDOMContentLoaded);
+var attachControlHandlers = () => {
+  const controls = document.getElementById("controls");
+  controls.addEventListener("volumechange", () => {
+    const toneDestination = getDestination();
+    toneDestination.mute = controls.muted;
+    toneDestination.output.gain.value = controls.volume;
+  });
+  controls.addEventListener("play", async () => {
+    await start();
+    if (!hasStarted) {
+      drawFeedbackCircle();
+      analyser = await playEnoPiece();
+      startVisualizer(analyser);
+      hasStarted = true;
+    } else {
+      getTransport().start();
+      getDestination().mute = false;
+    }
+  });
+  controls.addEventListener("pause", () => {
+    getTransport().pause();
+    getDestination().mute = true;
+  });
+};
 function getCanvasContext(id = "visualizer") {
   const canvas = document.getElementById(id);
   if (!canvas)
@@ -16106,7 +16148,7 @@ function drawCircle(ctx, x, y, radius, opacity, strokeColor = "255, 255, 255", l
   ctx.lineWidth = lineWidth;
   ctx.stroke();
 }
-function startVisualizer(analyser) {
+function startVisualizer(analyser2) {
   const context3 = getCanvasContext();
   if (!context3)
     return;
@@ -16119,7 +16161,7 @@ function startVisualizer(analyser) {
   function draw() {
     requestAnimationFrame(draw);
     const now = Date.now();
-    const raw = analyser.getValue();
+    const raw = analyser2.getValue();
     const minDb = -160;
     const maxDb = -30;
     const normalized = raw.map((val) => {

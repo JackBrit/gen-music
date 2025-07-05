@@ -1,11 +1,53 @@
 import { playEnoPiece } from './tracks/eno';
-import {Analyser} from 'tone';
+import * as Tone from 'tone';
 
-document.getElementById('piano-piece')?.addEventListener('click', async () => {
-   drawFeedbackCircle();
-    const analyser = await playEnoPiece();
-    startVisualizer(analyser);
+let hasStarted = false;
+let analyser: Tone.Analyser;
+
+const handleDOMContentLoaded = () => {
+  attachControlHandlers();
+};
+
+document.getElementById('play')?.addEventListener('click', async () => {
+   const audio = document.getElementById('controls') as HTMLAudioElement;
+   if (audio) {
+      audio.play().catch(err => {
+        console.error("Playback failed:", err);
+      });
+    }
 });
+
+document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
+
+const attachControlHandlers = () => {
+  const controls = document.getElementById('controls') as HTMLAudioElement;
+
+  controls.addEventListener('volumechange', () => {
+    const toneDestination = Tone.getDestination();
+    toneDestination.mute = controls.muted;
+    toneDestination.output.gain.value = controls.volume;
+  });
+
+  controls.addEventListener('play', async () => {
+    await Tone.start();
+
+    if (!hasStarted) {
+      drawFeedbackCircle();
+      analyser = await playEnoPiece();
+      startVisualizer(analyser);
+      hasStarted = true;
+    } else {
+      Tone.getTransport().start();
+      Tone.getDestination().mute = false;
+    }
+  });
+
+  controls.addEventListener('pause', () => {
+    Tone.getTransport().pause(); // Use pause instead of stop
+    Tone.getDestination().mute = true;
+  });
+};
+
 
 function getCanvasContext(id = 'visualizer') {
   const canvas = document.getElementById(id) as HTMLCanvasElement | null;
@@ -44,7 +86,7 @@ function drawCircle(
 
 
 
-export function startVisualizer(analyser: Analyser) {
+export function startVisualizer(analyser: Tone.Analyser) {
   const context = getCanvasContext();
   if (!context) return;
 

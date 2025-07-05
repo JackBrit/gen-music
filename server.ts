@@ -1,26 +1,39 @@
 import { join } from "path";
-import { file } from "bun";
+import { readFile } from "fs/promises";
 
 Bun.serve({
-    port: 3000,
-    fetch(req) {
-        const url = new URL(req.url);
+  port: 3000,
+  hostname: "0.0.0.0",
+  async fetch(req) {
+    const url = new URL(req.url);
+    const path = url.pathname === "/" ? "/index.html" : url.pathname;
+    const filePath = join("public", path);
 
-        // If requesting the root path, serve index.html
-        if (url.pathname === "/") {
-        return new Response(file("public/index.html"), {
-            headers: { "Content-Type": "text/html" },
-        });
-        }
-
-        // Try serving static files from the public directory
-        const filePath = join("public", url.pathname);
-        try {
-        return new Response(file(filePath));
-        } catch {
-        return new Response("File not found", { status: 404 });
-        }
+    try {
+      const data = await readFile(filePath);
+      const contentType = getContentType(filePath);
+      return new Response(data, {
+        status: 200,
+        headers: {
+          "Content-Type": contentType,
+        },
+      });
+    } catch (err) {
+      return new Response("File not found", { status: 404 });
+    }
   },
 });
 
-console.log("Server running at http://localhost:3000");
+function getContentType(path: string): string {
+  if (path.endsWith(".html")) return "text/html";
+  if (path.endsWith(".js")) return "application/javascript";
+  if (path.endsWith(".ts")) return "application/javascript";
+  if (path.endsWith(".css")) return "text/css";
+  if (path.endsWith(".wav")) return "audio/wav";
+  if (path.endsWith(".json")) return "application/json";
+  if (path.endsWith(".png")) return "image/png";
+  if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
+  return "application/octet-stream";
+}
+
+console.log("🌐 Server running at http://0.0.0.0:3000");
