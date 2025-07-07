@@ -10,7 +10,7 @@ export function scheduleRandomRepeat(
   maxDelay: number,
   startTime = getRandomBetween(minDelay, maxDelay)
 ) {
-  Tone.Transport.scheduleOnce((time) => {
+  Tone.Transport.scheduleOnce(time => {
     scheduledFunction(time);
     const delay = getRandomBetween(minDelay, maxDelay);
     scheduleRandomRepeat(scheduledFunction, minDelay, maxDelay, time + delay);

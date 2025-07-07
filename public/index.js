@@ -16022,8 +16022,8 @@ function scheduleRandomRepeat(scheduledFunction, minDelay, maxDelay, startTime =
 // src/tracks/eno.ts
 async function playEnoPiece() {
   return new Promise((resolve) => {
-    const freeverb = new Freeverb({ roomSize: 0.5, dampening: 2000, wet: 0.5 });
-    const reverbControllerLfo = new LFO({ min: 0.2, max: 1, frequency: 0.25 });
+    const freeverb = new Freeverb({ roomSize: 0.7, dampening: 2000, wet: 0.8 });
+    const reverbControllerLfo = new LFO({ min: 0.1, max: 0.8, frequency: 0.8 });
     const analyser = new Analyser("fft", 64);
     reverbControllerLfo.connect(freeverb.wet);
     reverbControllerLfo.start();
@@ -16053,7 +16053,7 @@ async function playEnoPiece() {
         A7: "a7.mp3",
         C8: "c8.mp3"
       },
-      volume: -6,
+      volume: -3,
       onload: () => {
         const bpm = 125;
         Transport.bpm.value = bpm;
@@ -16076,7 +16076,7 @@ async function playEnoPiece() {
     }, 30, 35, getRandomBetween(2, 15));
     scheduleRandomRepeat(function(time) {
       sampler.triggerAttack("Eb5", time);
-    }, 1, 5);
+    }, 1, 30, getRandomBetween(5, 15));
     scheduleRandomRepeat(function(time) {
       sampler.triggerAttack("F5", time);
     }, 12, 43);
@@ -16153,7 +16153,7 @@ function startVisualizer(analyser2) {
   if (!context3)
     return;
   const { ctx, width, height, centerX, centerY } = context3;
-  const MAX_CIRCLES = 50;
+  const MAX_CIRCLES = 5;
   const MIN_AMPLITUDE = 0.03;
   let lastCircleTime = 0;
   const CIRCLE_INTERVAL = 200;
@@ -16177,7 +16177,7 @@ function startVisualizer(analyser2) {
       circles.push({
         radius: 0,
         opacity: 1,
-        growthRate: 1 + scaledAmplitude * 10,
+        growthRate: 1 + scaledAmplitude * 8,
         fadeRate: 0.025
       });
       lastCircleTime = now;

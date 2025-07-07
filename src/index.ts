@@ -9,24 +9,18 @@ const handleDOMContentLoaded = () => {
 };
 
 document.getElementById('play')?.addEventListener('click', async () => {
-   const audio = document.getElementById('controls') as HTMLAudioElement;
-   if (audio) {
-      audio.play().catch(err => {
-        console.error("Playback failed:", err);
-      });
-    }
+  const audio = document.getElementById('controls') as HTMLAudioElement;
+  if (audio) {
+    audio.play().catch(err => {
+      console.error('Playback failed:', err);
+    });
+  }
 });
 
 document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
 
 const attachControlHandlers = () => {
   const controls = document.getElementById('controls') as HTMLAudioElement;
-
-  controls.addEventListener('volumechange', () => {
-    const toneDestination = Tone.getDestination();
-    toneDestination.mute = controls.muted;
-    toneDestination.output.gain.value = controls.volume;
-  });
 
   controls.addEventListener('play', async () => {
     await Tone.start();
@@ -47,7 +41,6 @@ const attachControlHandlers = () => {
     Tone.getDestination().mute = true;
   });
 };
-
 
 function getCanvasContext(id = 'visualizer') {
   const canvas = document.getElementById(id) as HTMLCanvasElement | null;
@@ -84,15 +77,13 @@ function drawCircle(
   ctx.stroke();
 }
 
-
-
 export function startVisualizer(analyser: Tone.Analyser) {
   const context = getCanvasContext();
   if (!context) return;
 
   const { ctx, width, height, centerX, centerY } = context;
 
-  const MAX_CIRCLES = 50;
+  const MAX_CIRCLES = 5;
   const MIN_AMPLITUDE = 0.03;
   let lastCircleTime = 0;
   const CIRCLE_INTERVAL = 200;
@@ -124,8 +115,8 @@ export function startVisualizer(analyser: Tone.Analyser) {
       circles.push({
         radius: 0,
         opacity: 1,
-        growthRate: 1 + scaledAmplitude * 10,
-        fadeRate: 0.025,
+        growthRate: 1 + scaledAmplitude * 8,
+        fadeRate: 0.025
       });
 
       lastCircleTime = now;

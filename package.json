@@ -4,7 +4,8 @@
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest",
-    "concurrently": "^9.2.0"
+    "concurrently": "^9.2.0",
+    "prettier": "3.6.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -17,5 +18,4 @@
     "watch:scss": "sass --watch src/styles/main.scss public/styles.css",
     "dev": "concurrently \"bun run dev:ts\" \"bun run watch:scss\""
   }
-
 }
