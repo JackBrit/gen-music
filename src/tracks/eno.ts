@@ -49,7 +49,7 @@ export async function playEnoPiece(): Promise<Tone.Analyser> {
     sampler.chain(freeverb, analyser, Tone.Destination);
 
     scheduleRandomRepeat(
-      function (time) {
+      time => {
         sampler.triggerAttack('F4', time);
       },
       1,
@@ -57,12 +57,12 @@ export async function playEnoPiece(): Promise<Tone.Analyser> {
       getRandomBetween(4, 16)
     );
     scheduleRandomRepeat(
-      function (time) {
+      time => {
         sampler.triggerAttack('Ab4', time);
       },
       15,
       30,
-      getRandomBetween(0, 15)
+      getRandomBetween(0, 10)
     );
     scheduleRandomRepeat(
       time => {
@@ -101,7 +101,7 @@ export async function playEnoPiece(): Promise<Tone.Analyser> {
       },
       15,
       30,
-      5
+      getRandomBetween(5, 8)
     );
   });
 }
