@@ -16023,7 +16023,7 @@ function scheduleRandomRepeat(scheduledFunction, minDelay, maxDelay, startTime =
 async function playEnoPiece() {
   return new Promise((resolve) => {
     const freeverb = new Freeverb({ roomSize: 0.7, dampening: 2000, wet: 0.8 });
-    const reverbControllerLfo = new LFO({ min: 0.1, max: 0.8, frequency: 0.8 });
+    const reverbControllerLfo = new LFO({ min: 0.1, max: 0.8, frequency: 0.25 });
     const analyser = new Analyser("fft", 64);
     reverbControllerLfo.connect(freeverb.wet);
     reverbControllerLfo.start();
@@ -16062,27 +16062,27 @@ async function playEnoPiece() {
       }
     });
     sampler.chain(freeverb, analyser, Destination);
-    scheduleRandomRepeat(function(time) {
+    scheduleRandomRepeat((time) => {
       sampler.triggerAttack("F4", time);
     }, 1, 50, getRandomBetween(4, 16));
-    scheduleRandomRepeat(function(time) {
+    scheduleRandomRepeat((time) => {
       sampler.triggerAttack("Ab4", time);
-    }, 15, 30, getRandomBetween(0, 15));
-    scheduleRandomRepeat(function(time) {
+    }, 15, 30, getRandomBetween(0, 10));
+    scheduleRandomRepeat((time) => {
       sampler.triggerAttack("C5", time);
     }, 5, 70, getRandomBetween(15, 25));
-    scheduleRandomRepeat(function(time) {
+    scheduleRandomRepeat((time) => {
       sampler.triggerAttack("Db5", time);
     }, 30, 35, getRandomBetween(2, 15));
-    scheduleRandomRepeat(function(time) {
+    scheduleRandomRepeat((time) => {
       sampler.triggerAttack("Eb5", time);
     }, 1, 30, getRandomBetween(5, 15));
-    scheduleRandomRepeat(function(time) {
+    scheduleRandomRepeat((time) => {
       sampler.triggerAttack("F5", time);
     }, 12, 43);
-    scheduleRandomRepeat(function(time) {
+    scheduleRandomRepeat((time) => {
       sampler.triggerAttack("Ab5", time);
-    }, 15, 30, 5);
+    }, 15, 30, getRandomBetween(5, 8));
   });
 }
 
@@ -16103,11 +16103,6 @@ document.getElementById("play")?.addEventListener("click", async () => {
 document.addEventListener("DOMContentLoaded", handleDOMContentLoaded);
 var attachControlHandlers = () => {
   const controls = document.getElementById("controls");
-  controls.addEventListener("volumechange", () => {
-    const toneDestination = getDestination();
-    toneDestination.mute = controls.muted;
-    toneDestination.output.gain.value = controls.volume;
-  });
   controls.addEventListener("play", async () => {
     await start();
     if (!hasStarted) {

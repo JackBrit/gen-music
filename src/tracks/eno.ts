@@ -1,10 +1,12 @@
 import * as Tone from 'tone';
 import { getRandomBetween, scheduleRandomRepeat } from '../utils';
 
+export const colour = '50, 29, 67';
+
 export async function playEnoPiece(): Promise<Tone.Analyser> {
   return new Promise(resolve => {
     const freeverb = new Tone.Freeverb({ roomSize: 0.7, dampening: 2000, wet: 0.8 });
-    const reverbControllerLfo = new Tone.LFO({ min: 0.1, max: 0.8, frequency: 0.8 });
+    const reverbControllerLfo = new Tone.LFO({ min: 0.1, max: 0.8, frequency: 0.25 });
     const analyser = new Tone.Analyser('fft', 64);
 
     reverbControllerLfo.connect(freeverb.wet);

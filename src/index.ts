@@ -1,4 +1,5 @@
 import { playEnoPiece } from './tracks/eno';
+import { playBlakePiece } from './tracks/blake';
 import * as Tone from 'tone';
 
 let hasStarted = false;
@@ -37,7 +38,7 @@ const attachControlHandlers = () => {
   });
 
   controls.addEventListener('pause', () => {
-    Tone.getTransport().pause(); // Use pause instead of stop
+    Tone.getTransport().pause();
     Tone.getDestination().mute = true;
   });
 };

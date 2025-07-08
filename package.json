@@ -16,6 +16,8 @@
   "scripts": {
     "dev:ts": "bun build src/index.ts --outdir=public --watch",
     "watch:scss": "sass --watch src/styles/main.scss public/styles.css",
-    "dev": "concurrently \"bun run dev:ts\" \"bun run watch:scss\""
+    "dev": "concurrently \"bun run dev:ts\" \"bun run watch:scss\"",
+    "build": "bun build src/index.ts --outdir=public",
+    "prod": "bun run build && bun run server.ts"
   }
 }
