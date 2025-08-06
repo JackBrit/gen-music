@@ -1,12 +1,45 @@
-import { playEnoPiece } from './tracks/eno';
-import { playBlakePiece } from './tracks/blake';
+import { ExternalTrackLoader } from './external-track-loader';
 import * as Tone from 'tone';
+
+const externalTrackLoader = new ExternalTrackLoader();
 
 let hasStarted = false;
 let analyser: Tone.Analyser;
+let currentTrackLoader: (() => Promise<Tone.Analyser>) | null = null;
+
+// Load the SD card track
+const loadSDCardTrack = async (filename = '1.ts') => {
+  const externalTrack = await externalTrackLoader.loadTrackFromFile(filename);
+  currentTrackLoader = externalTrack ? externalTrack.playFunction : null;
+  if (externalTrack) {
+    console.log(`Loaded external track: ${externalTrack.name}`);
+    if (externalTrack.colour) {
+      console.log(`Track color: ${externalTrack.colour}`);
+    }
+  } else {
+    console.error('Failed to load SD card track');
+  }
+};
+
+// Initialize with SD card track by default
+(async () => {
+  await loadSDCardTrack();
+})();
+
+// Expose functions for external use
+(window as any).loadSDCardTrack = loadSDCardTrack;
+(window as any).listSDCardTracks = () => externalTrackLoader.listAvailableTracks();
 
 const handleDOMContentLoaded = () => {
   attachControlHandlers();
+
+  const audio = document.getElementById('controls') as HTMLAudioElement;
+  if (audio) {
+    // Auto-start playback programmatically
+    audio.play().catch(err => {
+      console.error('Auto-play failed:', err);
+    });
+  }
 };
 
 document.getElementById('play')?.addEventListener('click', async () => {
@@ -28,9 +61,13 @@ const attachControlHandlers = () => {
 
     if (!hasStarted) {
       drawFeedbackCircle();
-      analyser = await playEnoPiece();
-      startVisualizer(analyser);
-      hasStarted = true;
+      if (currentTrackLoader) {
+        analyser = await currentTrackLoader();
+        startVisualizer(analyser);
+        hasStarted = true;
+      } else {
+        console.error('No track loaded');
+      }
     } else {
       Tone.getTransport().start();
       Tone.getDestination().mute = false;
@@ -38,7 +75,7 @@ const attachControlHandlers = () => {
   });
 
   controls.addEventListener('pause', () => {
-    Tone.getTransport().pause();
+    Tone.getTransport().pause(); // Use pause instead of stop
     Tone.getDestination().mute = true;
   });
 };
