@@ -16,6 +16,15 @@ const loadSDCardTrack = async (filename = '1.ts') => {
     if (externalTrack.colour) {
       console.log(`Track color: ${externalTrack.colour}`);
     }
+    const audio = document.getElementById('controls') as HTMLAudioElement;
+    if (audio) {
+      try {
+        await audio.play();
+        console.log('Autoplay started after track load');
+      } catch (err) {
+        console.error('Autoplay failed:', err);
+      }
+    }
   } else {
     console.error('Failed to load SD card track');
   }
@@ -32,14 +41,6 @@ const loadSDCardTrack = async (filename = '1.ts') => {
 
 const handleDOMContentLoaded = () => {
   attachControlHandlers();
-
-  const audio = document.getElementById('controls') as HTMLAudioElement;
-  if (audio) {
-    // Auto-start playback programmatically
-    audio.play().catch(err => {
-      console.error('Auto-play failed:', err);
-    });
-  }
 };
 
 document.getElementById('play')?.addEventListener('click', async () => {
